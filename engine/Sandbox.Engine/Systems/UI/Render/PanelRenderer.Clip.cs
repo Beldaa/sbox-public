@@ -32,7 +32,7 @@ internal partial class PanelRenderer
 
 		public ClipScope( Rect scissorRect, Vector4 cornerRadius, Matrix globalMatrix )
 		{
-			var renderer = GlobalContext.Current.UISystem.Renderer;
+			var renderer = GlobalContext.Current.UISystem.Renderer.Value;
 
 			Previous = renderer.Scissor;
 			PreviousGPU = renderer.ScissorGPU;
@@ -69,7 +69,7 @@ internal partial class PanelRenderer
 
 		public void Dispose()
 		{
-			var renderer = GlobalContext.Current.UISystem.Renderer;
+			var renderer = GlobalContext.Current.UISystem.Renderer.Value;
 			renderer.Scissor = Previous;
 			renderer.ScissorGPU = PreviousGPU;
 		}

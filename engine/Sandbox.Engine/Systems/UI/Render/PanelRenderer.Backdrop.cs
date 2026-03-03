@@ -6,7 +6,6 @@ internal partial class PanelRenderer
 {
 	private void BuildCommandList_Backdrop( Panel panel, ref RenderState state, CommandList commandList )
 	{
-		ThreadSafe.AssertIsMainThread();
 
 		var style = panel.ComputedStyle;
 		if ( style == null ) return;

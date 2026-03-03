@@ -136,7 +136,6 @@ partial class PanelRenderer
 
 	private void BuildCommandList_Background( Panel panel, ref RenderState state, CommandList commandList )
 	{
-		ThreadSafe.AssertIsMainThread();
 
 		// Always reset inverse scissor — outset shadows may have set it to 1
 		commandList.Attributes.Set( "HasInverseScissor", 0 );

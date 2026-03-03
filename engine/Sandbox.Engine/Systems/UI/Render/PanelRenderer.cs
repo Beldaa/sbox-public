@@ -15,8 +15,6 @@ internal sealed partial class PanelRenderer
 	/// </summary>
 	public void BuildCommandLists( RootPanel panel, float opacity = 1.0f )
 	{
-		ThreadSafe.AssertIsMainThread();
-
 		Screen = panel.PanelBounds;
 
 		MatrixStack.Clear();
@@ -101,8 +99,6 @@ internal sealed partial class PanelRenderer
 	/// </summary>
 	public void GatherCommandLists( RootPanel root, float opacity = 1.0f )
 	{
-		ThreadSafe.AssertIsMainThread();
-
 		var globalCL = root.PanelCommandList;
 		globalCL.Reset();
 

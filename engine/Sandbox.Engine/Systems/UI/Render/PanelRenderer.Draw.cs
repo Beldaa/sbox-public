@@ -28,7 +28,6 @@ internal partial class PanelRenderer
 
 	public void BuildCommandList_BackgroundTexture( Panel panel, Texture texture, in RenderState state, Length defaultSize, CommandList commandList )
 	{
-		ThreadSafe.AssertIsMainThread();
 
 		var style = panel.ComputedStyle;
 		if ( style == null ) return;
@@ -164,7 +163,6 @@ internal partial class PanelRenderer
 
 	private void BuildCommandList( Panel panel, ref RenderState state )
 	{
-		ThreadSafe.AssertIsMainThread();
 
 		panel.CommandList.Reset();
 

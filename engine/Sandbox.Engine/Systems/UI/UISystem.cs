@@ -4,6 +4,7 @@ using Sandbox.Modals;
 using Sandbox.Rendering;
 using Sandbox.UI;
 using Sandbox.VR;
+using System.Threading;
 
 namespace Sandbox;
 
@@ -12,7 +13,7 @@ namespace Sandbox;
 /// </summary>
 internal class UISystem
 {
-	internal PanelRenderer Renderer = new PanelRenderer();
+	internal ThreadLocal<PanelRenderer> Renderer = new( () => new PanelRenderer() );
 
 	internal PanelInput Input { get; } = new();
 

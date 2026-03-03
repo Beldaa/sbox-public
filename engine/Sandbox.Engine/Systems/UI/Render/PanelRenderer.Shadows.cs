@@ -65,7 +65,6 @@ partial class PanelRenderer
 
 	internal void BuildCommandList_BoxShadows( Panel panel, ref RenderState state, bool inset, CommandList commandList )
 	{
-		ThreadSafe.AssertIsMainThread();
 
 		var shadows = panel.ComputedStyle.BoxShadow;
 		var c = shadows.Count;

@@ -215,8 +215,6 @@ public partial class RootPanel : Panel
 
 	internal void Render( float opacity = 1.0f )
 	{
-		ThreadSafe.AssertIsMainThread();
-
 		PanelCommandList.ExecuteOnRenderThread();
 	}
 
@@ -226,17 +224,13 @@ public partial class RootPanel : Panel
 	/// </summary>
 	internal void BuildCommandLists( float opacity = 1.0f )
 	{
-		ThreadSafe.AssertIsMainThread();
-
-		var renderer = GlobalContext.Current.UISystem.Renderer;
+		var renderer = GlobalContext.Current.UISystem.Renderer.Value;
 		renderer.BuildCommandLists( this, opacity );
 	}
 
 	internal void GatherCommandLists( float opacity = 1.0f )
 	{
-		ThreadSafe.AssertIsMainThread();
-
-		var renderer = GlobalContext.Current.UISystem.Renderer;
+		var renderer = GlobalContext.Current.UISystem.Renderer.Value;
 		renderer.GatherCommandLists( this, opacity );
 	}
 
