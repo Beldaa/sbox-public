@@ -174,8 +174,8 @@ bool UsesBakedLightmaps     < Attribute( "UsesBakedLightmaps" ); >;
 // Bless this
 #define LightMap( a ) Bindless::GetTexture2DArray( g_nLightmapTextureIndices[a] )
 
-#define DIRECTIONAL_LIGHTMAP_STRENGTH 1.0f
-#define DIRECTIONAL_LIGHTMAP_MINZ 0.05
+#define DIRECTIONAL_LIGHTMAP_STRENGTH 1.00f
+#define DIRECTIONAL_LIGHTMAP_MINZ 0.05f
 
 class LightmappedLight : ProbeLight
 {
