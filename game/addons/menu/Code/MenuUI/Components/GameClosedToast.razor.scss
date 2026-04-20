@@ -112,6 +112,17 @@ GameClosedToast
         border-radius: 4px;
         box-shadow: 2px 2px 5px #0003;
     }
+
+    &:hover
+    {
+        > .close-progress
+        {
+            > .inner
+            {
+                background-color: #8e9ec244;
+            }
+        }
+    }
 }
 
 .top
@@ -208,12 +219,14 @@ GameClosedToast
     border-radius: 8px;
 
     &:hover
-    {
+    {		
+		sound-in: ui.button.over;
         background-color: #b2bfd822;
     }
 
     &.active
     {
+		sound-in: ui.button.over;
         color: white;
     }
 }
