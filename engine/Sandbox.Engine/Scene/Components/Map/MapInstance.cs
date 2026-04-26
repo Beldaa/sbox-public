@@ -590,6 +590,64 @@ file class MapComponentMapLoader : SceneMapLoader
 		fog.HeightWidth = kv.GetValue<float>( "cubemapfogheightwidth" );
 	}
 
+	void CreateDoorRotating( GameObject go, ObjectEntry kv )
+	{
+		// Doors are fully networked. Don't spawn on clients — the host's
+		// NetworkSpawn below will replicate the GameObject to them.
+		if ( Networking.IsClient )
+		{
+			go.Destroy();
+			return;
+		}
+
+		var model = kv.GetResource<Model>( "model" );
+
+		// Renderer
+		if ( model is not null )
+		{
+			var renderer = go.Components.Create<SkinnedModelRenderer>();
+			renderer.Model = model;
+			renderer.Tint = kv.GetValue( "rendercolor", Color.White );
+
+			var skin = kv.GetValue<string>( "skin" );
+			if ( !string.IsNullOrEmpty( skin ) )
+				renderer.MaterialGroup = skin;
+
+			var bodyGroups = kv.GetValue<string>( "bodygroups" );
+			if ( !string.IsNullOrEmpty( bodyGroups ) && ulong.TryParse( bodyGroups, out var mask ) )
+				renderer.BodyGroups = mask;
+		}
+
+		// Collider
+		if ( model is not null )
+		{
+			var collider = go.Components.Create<ModelCollider>();
+			collider.Model = model;
+		}
+
+		// Door logic
+		var door = go.Components.Create<DoorRotating>();
+		door.RotationDistance = kv.GetValue( "distance", 90f );
+		door.Speed = kv.GetValue( "speed", DoorRotating.DefaultSpeed );
+		door.AutoCloseDelay = kv.GetValue( "returndelay", -1f );
+		door.IsLocked = kv.GetValue<bool>( "startslocked" );
+		door.Health = kv.GetValue( "health", 0f );
+
+		var openDir = kv.GetValue<int>( "opendir" );
+		door.OpenDirection = openDir switch
+		{
+			1 => DoorRotating.OpenDirectionMode.ForwardOnly,
+			2 => DoorRotating.OpenDirectionMode.BackwardOnly,
+			_ => DoorRotating.OpenDirectionMode.Both
+		};
+
+		// Match prop networking semantics: state is owned by the host, but
+		// any client can take over (e.g. when the host disconnects).
+		go.Network.SetOrphanedMode( NetworkOrphaned.ClearOwner );
+		go.Network.SetOwnerTransfer( OwnerTransfer.Takeover );
+		go.NetworkSpawn();
+	}
+
 	void CreateProp( GameObject go, ObjectEntry kv )
 	{
 		var model = kv.GetResource<Model>( "model" );
@@ -735,6 +793,12 @@ file class MapComponentMapLoader : SceneMapLoader
 			case "env_cubemap_fog":
 				{
 					CreateCubemapFog( go, kv );
+					break;
+				}
+
+			case "prop_door_rotating":
+				{
+					CreateDoorRotating( go, kv );
 					break;
 				}
 		}
