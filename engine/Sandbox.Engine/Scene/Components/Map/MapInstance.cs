@@ -632,6 +632,7 @@ file class MapComponentMapLoader : SceneMapLoader
 		door.AutoCloseDelay = kv.GetValue( "returndelay", -1f );
 		door.IsLocked = kv.GetValue<bool>( "startslocked" );
 		door.Health = kv.GetValue( "health", 0f );
+		door.LinkName = kv.TargetName;
 
 		var openDir = kv.GetValue<int>( "opendir" );
 		door.OpenDirection = openDir switch

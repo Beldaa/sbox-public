@@ -66,6 +66,13 @@ public sealed class DoorRotating : Component, Component.IPressable, Component.ID
 	[Property] public Vector3 HingeOffset { get; set; }
 
 	/// <summary>
+	/// If set, doors with the same link name operate together as one unit (double doors).
+	/// All linked doors open, close, lock and unlock as a group. Set automatically from
+	/// the map targetname when loading a prop_door_rotating.
+	/// </summary>
+	[Property, Sync] public string LinkName { get; set; }
+
+	/// <summary>
 	/// Called when the door starts opening.
 	/// </summary>
 	[Property, Group( "Events" )] public Action OnOpening { get; set; }
@@ -192,6 +199,22 @@ public sealed class DoorRotating : Component, Component.IPressable, Component.ID
 		}
 	}
 
+	/// <summary>
+	/// Yields all other doors that share this door's <see cref="LinkName"/>.
+	/// Used to operate double doors as a single unit.
+	/// </summary>
+	IEnumerable<DoorRotating> LinkedDoors()
+	{
+		if ( string.IsNullOrEmpty( LinkName ) ) yield break;
+
+		foreach ( var other in Scene.GetAllComponents<DoorRotating>() )
+		{
+			if ( other == this ) continue;
+			if ( other.LinkName == LinkName )
+				yield return other;
+		}
+	}
+
 	public bool CanPress( IPressable.Event e )
 	{
 		return true;
@@ -224,11 +247,22 @@ public sealed class DoorRotating : Component, Component.IPressable, Component.ID
 		if ( IsLocked )
 		{
 			OnLockedUse?.Invoke();
+			foreach ( var sibling in LinkedDoors() )
+				sibling.OnLockedUse?.Invoke();
 			return true; // consumed — don't let the press fall through to anything behind us
 		}
 
 		var sign = ComputeOpenSign( e );
 
+		ApplyPress( sign );
+		foreach ( var sibling in LinkedDoors() )
+			sibling.ApplyPress( sign );
+
+		return true;
+	}
+
+	void ApplyPress( int sign )
+	{
 		if ( State == DoorState.Closed )
 			OpenInDirection( sign );
 		else if ( State == DoorState.Open )
@@ -237,8 +271,6 @@ public sealed class DoorRotating : Component, Component.IPressable, Component.ID
 			Close();
 		else if ( State == DoorState.Closing )
 			ReverseToOpening();
-
-		return true;
 	}
 
 	/// <summary>
@@ -350,21 +382,25 @@ public sealed class DoorRotating : Component, Component.IPressable, Component.ID
 	}
 
 	/// <summary>
-	/// Locks the door.
+	/// Locks the door (and any linked doors).
 	/// </summary>
 	[Rpc.Host]
 	public void Lock()
 	{
 		IsLocked = true;
+		foreach ( var sibling in LinkedDoors() )
+			sibling.IsLocked = true;
 	}
 
 	/// <summary>
-	/// Unlocks the door.
+	/// Unlocks the door (and any linked doors).
 	/// </summary>
 	[Rpc.Host]
 	public void Unlock()
 	{
 		IsLocked = false;
+		foreach ( var sibling in LinkedDoors() )
+			sibling.IsLocked = false;
 	}
 
 	protected override void OnFixedUpdate()
